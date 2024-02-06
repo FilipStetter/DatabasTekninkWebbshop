@@ -1,12 +1,16 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.*;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.Set;
 
 public class Repository {
 
         Properties p = new Properties();
+
+
 
 
     public Repository() {
@@ -45,10 +49,12 @@ public class Repository {
 
             e.printStackTrace();
             System.out.println("e.mess "+e.getMessage());
-            return "Could not add order ";
+            return "Kunde inte skapa beställning ";
         }
-        return "Your order was added." ;
+        return "Din beställning är skapad " ;
+
     }
+
 
     public int authenticateUser(String username, String password) {
         String query = "SELECT id FROM Kund WHERE användarnamn = ? AND lösenord = ?";
@@ -72,4 +78,35 @@ public class Repository {
 
         return kundId;
     }
+
+
+    public void displayShoes() {
+        try {Connection conn = DriverManager.getConnection(p.getProperty("connectionString"),
+                p.getProperty("name"),
+                p.getProperty("password"));
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT s.id, s.modell, s.storlek, s.pris, m.namn AS markenamn, f.namn AS färgnamn FROM Skor s " +
+                    "JOIN Märke m ON s.märkeid = m.id " +
+                    "JOIN Färg f ON s.färgid = f.id");
+
+            while (rs.next()) {
+                int skoId = rs.getInt("id");
+                String modell = rs.getString("modell");
+                int storlek = rs.getInt("storlek");
+                double pris = rs.getDouble("pris");
+                String märkeNamn = rs.getString("markenamn");
+                String färgNamn = rs.getString("färgnamn");
+
+                System.out.println("Sko: " + skoId + ", Modell: " + modell + ", Storlek: " + storlek  +
+                        ", Märke: " + märkeNamn + ", Färg: " + färgNamn + ", Pris: " + pris);
+            }
+
+            rs.close();
+            stmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

@@ -1,5 +1,7 @@
 import java.sql.*;
+import java.util.Random;
 import java.util.Scanner;
+import java.util.Set;
 
 public class DataHandler {
 
@@ -24,16 +26,27 @@ public class DataHandler {
                 System.out.println("Fel användarnamn eller lösenord. Försök igen.");
                 continue;
             }
-            System.out.println("Skriv ditt Beställningsid?  ");
+
+            System.out.println("Ange ditt beställningsId: ");
             beställningsId = sc.nextInt();
 
-            System.out.println("Vilken sko vill du beställa?  ");
+
+            // Fetch available shoes
+            System.out.println("Tillgängliga skor:");
+            r.displayShoes();
+
+            System.out.println("Ange numret för skon du vill beställa: ");
             skoId = sc.nextInt();
 
 
             System.out.println(r.addToCart( kundId,  beställningsId,  skoId));
+
+
+            System.exit(0);
         }
     }
+
+
 
     public static void main(String args[])  {
         DataHandler d = new DataHandler();
