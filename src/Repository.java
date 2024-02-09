@@ -1,6 +1,7 @@
 import java.io.FileInputStream;
 import java.sql.*;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 
 public class Repository {
@@ -78,32 +79,39 @@ public class Repository {
 
 
     public void displayShoes() {
-        try {Connection conn = DriverManager.getConnection(p.getProperty("connectionString"),
+        String query = "SELECT s.id, s.modell, s.storlek, s.pris, m.namn AS markenamn, f.namn AS färgnamn FROM Skor s " +
+                "JOIN Märke m ON s.märkeid = m.id " +
+                "JOIN Färg f ON s.färgid = f.id";
+
+        try (Connection conn = DriverManager.getConnection(p.getProperty("connectionString"),
                 p.getProperty("name"),
                 p.getProperty("password"));
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT s.id, s.modell, s.storlek, s.pris, m.namn AS markenamn, f.namn AS färgnamn FROM Skor s " +
-                    "JOIN Märke m ON s.märkeid = m.id " +
-                    "JOIN Färg f ON s.färgid = f.id");
+             Statement stmt = conn.createStatement()) {
 
-            while (rs.next()) {
-                int skoId = rs.getInt("id");
-                String modell = rs.getString("modell");
-                int storlek = rs.getInt("storlek");
-                double pris = rs.getDouble("pris");
-                String märkeNamn = rs.getString("markenamn");
-                String färgNamn = rs.getString("färgnamn");
+            ResultSet rs = stmt.executeQuery(query);
+            processResultSet(rs, result -> {
+                try {
+                    int skoId = result.getInt("id");
+                    String modell = result.getString("modell");
+                    int storlek = result.getInt("storlek");
+                    double pris = result.getDouble("pris");
+                    String märkeNamn = result.getString("markenamn");
+                    String färgNamn = result.getString("färgnamn");
 
-                System.out.println("Sko: " + skoId + ", Modell: " + modell + ", Storlek: " + storlek  +
-                        ", Märke: " + märkeNamn + ", Färg: " + färgNamn + ", Pris: " + pris);
-            }
+                    System.out.println("Sko: " + skoId + ", Modell: " + modell + ", Storlek: " + storlek +
+                            ", Märke: " + märkeNamn + ", Färg: " + färgNamn + ", Pris: " + pris);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            });
 
-            rs.close();
-            stmt.close();
-            conn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
+    private void processResultSet(ResultSet rs, Consumer<ResultSet> consumer) throws SQLException {
+        while (rs.next()) {
+            consumer.accept(rs);
+        }
+    }
 }

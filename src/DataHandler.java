@@ -1,56 +1,49 @@
 import java.util.Scanner;
 
-
 public class DataHandler {
+
+    public interface InputHandler {
+        String getInput();
+    }
 
     public DataHandler() {
         Repository r = new Repository();
-        int kundId;
-        int beställningsId;
-        int skoId;
 
         Scanner sc = new Scanner(System.in);
 
-        while(true){
-
+        InputHandler inputHandler = () -> {
             System.out.println("Ange ditt användarnamn: ");
-            String användarnamn = sc.nextLine();
+            return sc.nextLine();
+        };
+
+        String användarnamn = inputHandler.getInput();
+
+        inputHandler = () -> {
             System.out.println("Ange ditt lösenord: ");
-            String lösenord = sc.nextLine();
+            return sc.nextLine();
+        };
 
+        String lösenord = inputHandler.getInput();
 
-            kundId = r.authenticateUser(användarnamn, lösenord);
-            if (kundId == -1) {
-                System.out.println("Fel användarnamn eller lösenord. Försök igen.");
-                continue;
-            }
-
-            System.out.println("Ange ditt beställningsId: ");
-            beställningsId = sc.nextInt();
-
-
-            // Fetch available shoes
-            System.out.println("Tillgängliga skor:");
-            r.displayShoes();
-
-            System.out.println("Ange numret för skon du vill beställa: ");
-            skoId = sc.nextInt();
-
-
-            System.out.println(r.addToCart( kundId,  beställningsId,  skoId));
-
-
-            System.exit(0);
+        int kundId = r.authenticateUser(användarnamn, lösenord);
+        if (kundId == -1) {
+            System.out.println("Fel användarnamn eller lösenord. Försök igen.");
+            return;
         }
+
+        System.out.println("Ange ditt beställningsId: ");
+        int beställningsId = sc.nextInt();
+
+        System.out.println("Tillgängliga skor:");
+        r.displayShoes();
+
+        System.out.println("Ange numret för skon du vill beställa: ");
+        int skoId = sc.nextInt();
+
+        System.out.println(r.addToCart(kundId, beställningsId, skoId));
     }
 
-
-
-    public static void main(String args[])  {
+    public static void main(String args[]) {
         DataHandler d = new DataHandler();
     }
-
-
 }
-
-
