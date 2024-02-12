@@ -21,7 +21,7 @@ public class Repository {
     }
 
 
-    public String addToCart (int kundId, int beställningsId, int skoId) {
+    public String addToCart (int kundId, Integer beställningsId, int skoId) {
 
         ResultSet rs = null;
         String query = "call AddToCart(?,?,?)";
@@ -34,7 +34,7 @@ public class Repository {
              CallableStatement stmt = con.prepareCall(query)){
 
             stmt.setInt(1, kundId);
-            stmt.setInt(2, beställningsId);
+            stmt.setObject(2, beställningsId, Types.INTEGER);
             stmt.setInt(3, skoId);
 
             rs = stmt.executeQuery();
@@ -81,7 +81,8 @@ public class Repository {
     public void displayShoes() {
         String query = "SELECT s.id, s.modell, s.storlek, s.pris, m.namn AS markenamn, f.namn AS färgnamn FROM Skor s " +
                 "JOIN Märke m ON s.märkeid = m.id " +
-                "JOIN Färg f ON s.färgid = f.id";
+                "JOIN Färg f ON s.färgid = f.id " +
+                "ORDER BY s.id";
 
         try (Connection conn = DriverManager.getConnection(p.getProperty("connectionString"),
                 p.getProperty("name"),

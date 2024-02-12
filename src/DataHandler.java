@@ -2,16 +2,18 @@ import java.util.Scanner;
 
 public class DataHandler {
 
-    public interface InputHandler {
-        String getInput();
-    }
+
 
     public DataHandler() {
         Repository r = new Repository();
 
+
+
         Scanner sc = new Scanner(System.in);
 
-        InputHandler inputHandler = () -> {
+        InputHandlerInterface.InputHandler
+
+        inputHandler = () -> {
             System.out.println("Ange ditt användarnamn: ");
             return sc.nextLine();
         };
@@ -31,8 +33,11 @@ public class DataHandler {
             return;
         }
 
-        System.out.println("Ange ditt beställningsId: ");
-        int beställningsId = sc.nextInt();
+        System.out.println("Ange ditt beställningsId eller ange 0 om du saknar beställningsId: ");
+        Integer beställningsId = sc.nextInt();
+        if(beställningsId != null && beställningsId == 0){
+            beställningsId = null;
+        }
 
         System.out.println("Tillgängliga skor:");
         r.displayShoes();
